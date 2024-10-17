@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
 import { randomUUID } from 'crypto';
+import { Document } from 'mongoose';
 
 const SALT_WORK_FACTOR = 10;
 
@@ -20,6 +21,9 @@ export enum UserRoles {
 export class User {
   @Prop({ required: true, unique: true })
   email: string;
+
+  @Prop({ required: true })
+  token: string;
 
   @Prop({ required: true })
   displayName: string;
