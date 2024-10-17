@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { MainNav } from '@/components/mainNav/mainNav';
 import { Button } from '@/components/ui/button';
+import { NewCocktails } from '@/features/cocktails/newCocktails';
 import { selectUser } from '@/features/users/usersSlice';
 import { logout } from '@/features/users/usersThunks';
 import { ArrowRightStartOnRectangleIcon, SquaresPlusIcon, UserIcon } from '@heroicons/react/24/outline';
@@ -12,7 +13,6 @@ export const Header: React.FC = () => {
   const user = useAppSelector(selectUser);
 
   const handleLogout = () => {
-    console.log('logout');
     dispatch(logout());
   };
 
@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
           <nav className='flex items-center gap-2'>
             {user ? (
               <Button onClick={handleLogout} size={'sm'} variant={'ghost'}>
-                Выйти
+                Logout
                 <ArrowRightStartOnRectangleIcon />
               </Button>
             ) : (
@@ -36,12 +36,12 @@ export const Header: React.FC = () => {
               </Link>
             )}
 
-            <Link to={'/'}>
+            <NewCocktails>
               <Button size={'sm'}>
                 Add cocktail
                 <SquaresPlusIcon />
               </Button>
-            </Link>
+            </NewCocktails>
           </nav>
         </div>
       </div>

@@ -18,6 +18,13 @@ export interface Cocktail {
   grades: Grade[];
 }
 
+export interface CocktailMutation {
+  name: string;
+  image: File | null;
+  recipe: string;
+  ingredients: Ingredient[];
+}
+
 export interface LoginMutation {
   email: string;
   password: string;
