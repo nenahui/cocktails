@@ -14,17 +14,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { createCocktail } from '@/features/cocktails/cocktailsThunks';
 import type { CocktailMutation } from '@/types';
 import { XCircleIcon } from '@heroicons/react/24/outline';
+import dayjs from 'dayjs';
 import React, { type PropsWithChildren } from 'react';
+import { toast } from 'sonner';
+
+const initialState: CocktailMutation = {
+  name: '',
+  image: null,
+  recipe: '',
+  ingredients: [{ name: '', quantity: '' }],
+};
 
 export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [cocktailMutation, setCocktailMutation] = React.useState<CocktailMutation>({
-    name: '',
-    image: null,
-    recipe: '',
-    ingredients: [{ name: '', quantity: '' }],
-  });
+  const [cocktailMutation, setCocktailMutation] = React.useState<CocktailMutation>(initialState);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -68,15 +72,23 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(createCocktail(cocktailMutation));
+    await dispatch(createCocktail(cocktailMutation));
+    setIsOpen(false);
+    toast.message('Your cocktail is under moderator review.', {
+      description: `${dayjs(new Date()).format(`dddd, MMMM DD, YYYY [at] hh:mm A`)}`,
+      className: 'border',
+    });
   };
 
-  console.log(cocktailMutation);
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    setCocktailMutation(initialState);
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
+    <Dialog open={isOpen} onOpenChange={(open) => handleOpenChange(open)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className={'gap-0 max-h-[90%]'}>
         <DialogHeader className={'pb-0'}>
@@ -107,6 +119,7 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
                     value={ingredient.name}
                     required
                   />
+
                   <Input
                     id={'quantity'}
                     onChange={(event) => handleIngredientChange(event, index)}
@@ -114,7 +127,7 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
                     value={ingredient.quantity}
                     required
                   />
-                  2
+
                   {index > 0 && (
                     <Button
                       onClick={() => handleIngredientDelete(index)}

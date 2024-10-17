@@ -6,14 +6,16 @@ import { selectUser } from '@/features/users/usersSlice';
 import { logout } from '@/features/users/usersThunks';
 import { ArrowRightStartOnRectangleIcon, SquaresPlusIcon, UserIcon } from '@heroicons/react/24/outline';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate('/');
   };
 
   return (
@@ -36,12 +38,14 @@ export const Header: React.FC = () => {
               </Link>
             )}
 
-            <NewCocktails>
-              <Button size={'sm'}>
-                Add cocktail
-                <SquaresPlusIcon />
-              </Button>
-            </NewCocktails>
+            {user && (
+              <NewCocktails>
+                <Button size={'sm'}>
+                  Add cocktail
+                  <SquaresPlusIcon />
+                </Button>
+              </NewCocktails>
+            )}
           </nav>
         </div>
       </div>

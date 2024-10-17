@@ -36,15 +36,17 @@ export const MainNav: React.FC<Props> = ({ user }) => {
         >
           Home
         </Link>
-        <Link
-          to='/news'
-          className={cn(
-            'transition-colors hover:text-foreground/80',
-            pathname === '/news' ? 'text-foreground' : 'text-foreground/60'
-          )}
-        >
-          My cocktails
-        </Link>
+        {user && (
+          <Link
+            to='/my-cocktails'
+            className={cn(
+              'transition-colors hover:text-foreground/80',
+              pathname === '/my-cocktails' ? 'text-foreground' : 'text-foreground/60'
+            )}
+          >
+            My cocktails
+          </Link>
+        )}
       </nav>
     </div>
   );
