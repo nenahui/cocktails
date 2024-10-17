@@ -1,21 +1,28 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { MainNav } from '@/components/mainNav/mainNav';
 import { Button } from '@/components/ui/button';
+import { fetchCocktails } from '@/features/cocktails/cocktailsThunks';
 import { NewCocktails } from '@/features/cocktails/newCocktails';
 import { selectUser } from '@/features/users/usersSlice';
 import { logout } from '@/features/users/usersThunks';
 import { ArrowRightStartOnRectangleIcon, SquaresPlusIcon, UserIcon } from '@heroicons/react/24/outline';
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+  const { pathname: path } = useLocation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/');
+  const handleLogout = async () => {
+    await dispatch(logout());
+
+    if (path === '/') {
+      dispatch(fetchCocktails());
+    } else {
+      navigate('/');
+    }
   };
 
   return (

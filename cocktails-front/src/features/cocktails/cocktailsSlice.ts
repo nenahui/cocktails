@@ -21,7 +21,14 @@ const initialState: CocktailsState = {
 export const cocktailsSlice = createSlice({
   name: 'cocktails',
   initialState,
-  reducers: {},
+  reducers: {
+    addCocktail: (state, { payload: cocktail }: { payload: Cocktail }) => {
+      state.cocktails.push(cocktail);
+    },
+    addMyCocktail: (state, { payload: cocktail }: { payload: Cocktail }) => {
+      state.myCocktails.push(cocktail);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCocktails.pending, (state) => {
@@ -39,13 +46,7 @@ export const cocktailsSlice = createSlice({
       .addCase(createCocktail.pending, (state) => {
         state.cocktailsCreating = true;
       })
-      .addCase(createCocktail.fulfilled, (state, { payload: cocktail }) => {
-        if (cocktail.isPublished) {
-          state.cocktails.push(cocktail);
-        } else if (!cocktail.isPublished) {
-          state.myCocktails.push(cocktail);
-        }
-
+      .addCase(createCocktail.fulfilled, (state) => {
         state.cocktailsCreating = false;
       })
       .addCase(createCocktail.rejected, (state) => {
@@ -80,3 +81,5 @@ export const {
   selectMyCocktailsFetching,
   selectMyCocktails,
 } = cocktailsSlice.selectors;
+
+export const { addCocktail, addMyCocktail } = cocktailsSlice.actions;

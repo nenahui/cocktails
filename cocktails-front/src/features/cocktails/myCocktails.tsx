@@ -4,6 +4,7 @@ import { selectMyCocktails, selectMyCocktailsFetching } from '@/features/cocktai
 import { fetchMyCocktails } from '@/features/cocktails/cocktailsThunks';
 import { CocktailsCard } from '@/features/cocktails/components/cocktailsCard/cocktailsCard';
 import { selectUser } from '@/features/users/usersSlice';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect } from 'react';
 
 export const MyCocktails: React.FC = () => {
@@ -31,9 +32,22 @@ export const MyCocktails: React.FC = () => {
         </small>
       ) : (
         <section className={'grid grid-cols-3 gap-4'}>
-          {myCocktails.map((cocktail) => (
-            <CocktailsCard key={cocktail._id} cocktail={cocktail} />
-          ))}
+          <AnimatePresence>
+            {myCocktails.map((cocktail, index) => (
+              <motion.div
+                key={cocktail._id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.2,
+                }}
+              >
+                <CocktailsCard cocktail={cocktail} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </section>
       )}
     </>

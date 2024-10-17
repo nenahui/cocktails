@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,7 +11,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { addCocktail, addMyCocktail } from '@/features/cocktails/cocktailsSlice';
 import { createCocktail } from '@/features/cocktails/cocktailsThunks';
+import { selectUser } from '@/features/users/usersSlice';
 import type { CocktailMutation } from '@/types';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 import dayjs from 'dayjs';
@@ -26,6 +28,7 @@ const initialState: CocktailMutation = {
 };
 
 export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
+  const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(false);
   const [cocktailMutation, setCocktailMutation] = React.useState<CocktailMutation>(initialState);
@@ -74,10 +77,23 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await dispatch(createCocktail(cocktailMutation));
+    const result = await dispatch(createCocktail(cocktailMutation));
+
+    if (createCocktail.fulfilled.match(result)) {
+      const cocktail = result.payload;
+      if (user?.role === 'admin') {
+        dispatch(addCocktail(cocktail));
+        dispatch(addMyCocktail(cocktail));
+      } else if (user?.role === 'user') {
+        dispatch(addMyCocktail(cocktail));
+      }
+    } else {
+      console.error(result.error);
+    }
+
     setIsOpen(false);
     toast.message('Your cocktail is under moderator review.', {
-      description: `${dayjs(new Date()).format(`dddd, MMMM DD, YYYY [at] hh:mm A`)}`,
+      description: `${dayjs(new Date()).format('dddd, MMMM DD, YYYY [at] hh:mm A')}`,
       className: 'border',
     });
   };
