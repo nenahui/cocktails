@@ -1,16 +1,31 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { API_URL } from '@/consts';
 import { cn } from '@/lib/utils';
-import { BugAntIcon } from '@heroicons/react/24/outline';
+import type { User } from '@/types';
+import { UserIcon } from '@heroicons/react/24/outline';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-export const MainNav = () => {
+interface Props {
+  user: User | null;
+}
+
+export const MainNav: React.FC<Props> = ({ user }) => {
   const { pathname } = useLocation();
 
   return (
     <div className='mr-4 flex'>
-      <Link to='/' className='mr-4 flex items-center space-x-1'>
-        <BugAntIcon className={'size-5'} />
-        <span>Cocktails</span>
-      </Link>
+      {user && (
+        <div className={'flex items-center gap-2 mr-4'}>
+          <Avatar className={'border size-8'}>
+            <AvatarFallback className={'bg-gray-200/50'}>
+              <UserIcon className={'size-4 text-muted-foreground'} />
+            </AvatarFallback>
+            <AvatarImage src={`${API_URL}/${user.avatar}`} alt={user.displayName} />
+          </Avatar>
+          <span className={'text-sm font-medium'}>{user.displayName}</span>
+        </div>
+      )}
       <nav className='flex items-center gap-4 text-sm'>
         <Link
           to='/'
@@ -19,7 +34,7 @@ export const MainNav = () => {
             pathname === '/' ? 'text-foreground' : 'text-foreground/60'
           )}
         >
-          Главная
+          Home
         </Link>
         <Link
           to='/news'
@@ -28,7 +43,7 @@ export const MainNav = () => {
             pathname === '/news' ? 'text-foreground' : 'text-foreground/60'
           )}
         >
-          Мои коктейли
+          My cocktails
         </Link>
         <Link
           to='/events'
@@ -37,7 +52,7 @@ export const MainNav = () => {
             pathname === '/events' ? 'text-foreground' : 'text-foreground/60'
           )}
         >
-          Добавить коктейль
+          Add cocktail
         </Link>
       </nav>
     </div>
