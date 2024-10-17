@@ -62,7 +62,7 @@ export class CocktailsController {
         },
       }),
       fileFilter: (_req, file, callback) => {
-        if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+        if (file.mimetype.match(/\/(jpg|webp|jpeg|png)$/)) {
           callback(null, true);
         } else {
           callback(
