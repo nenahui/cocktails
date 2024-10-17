@@ -20,11 +20,18 @@ export const Cocktails: React.FC = () => {
 
   return (
     <>
-      <section className={'grid grid-cols-3 gap-4'}>
-        {cocktails.map((cocktail) => (
-          <CocktailsCard key={cocktail._id} cocktail={cocktail} />
-        ))}
-      </section>
+      {!cocktailsFetching && cocktails.length === 0 ? (
+        <small className={'text-center block mx-auto text-muted-foreground'}>
+          No cocktails found. <br />
+          Please add a cocktail.
+        </small>
+      ) : (
+        <section className={'grid grid-cols-3 gap-4'}>
+          {cocktails.map((cocktail) => (
+            <CocktailsCard key={cocktail._id} cocktail={cocktail} />
+          ))}
+        </section>
+      )}
     </>
   );
 };
