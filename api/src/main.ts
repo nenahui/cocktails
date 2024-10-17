@@ -7,6 +7,7 @@ import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableCors({ origin: 'http://localhost:5173' });
   app.useStaticAssets(join(__dirname, '..', 'public'));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe());
