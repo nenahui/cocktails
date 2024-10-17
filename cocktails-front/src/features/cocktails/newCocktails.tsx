@@ -11,13 +11,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { addCocktail, addMyCocktail } from '@/features/cocktails/cocktailsSlice';
-import { createCocktail } from '@/features/cocktails/cocktailsThunks';
+import { createCocktail, fetchCocktails, fetchMyCocktails } from '@/features/cocktails/cocktailsThunks';
 import { selectUser } from '@/features/users/usersSlice';
 import type { CocktailMutation } from '@/types';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 import dayjs from 'dayjs';
 import React, { type PropsWithChildren } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const initialState: CocktailMutation = {
@@ -29,6 +29,7 @@ const initialState: CocktailMutation = {
 
 export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
   const user = useAppSelector(selectUser);
+  const { pathname: path } = useLocation();
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(false);
   const [cocktailMutation, setCocktailMutation] = React.useState<CocktailMutation>(initialState);
@@ -77,25 +78,22 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await dispatch(createCocktail(cocktailMutation));
+    await dispatch(createCocktail(cocktailMutation)).unwrap();
 
-    if (createCocktail.fulfilled.match(result)) {
-      const cocktail = result.payload;
-      if (user?.role === 'admin') {
-        dispatch(addCocktail(cocktail));
-        dispatch(addMyCocktail(cocktail));
-      } else if (user?.role === 'user') {
-        dispatch(addMyCocktail(cocktail));
-      }
-    } else {
-      console.error(result.error);
+    if (path === '/' && user && user.role === 'admin') {
+      await dispatch(fetchCocktails());
+    } else if (path === '/my-cocktails' && user) {
+      await dispatch(fetchMyCocktails(user._id));
     }
 
     setIsOpen(false);
-    toast.message('Your cocktail is under moderator review.', {
-      description: `${dayjs(new Date()).format('dddd, MMMM DD, YYYY [at] hh:mm A')}`,
-      className: 'border',
-    });
+    toast.message(
+      user?.role === 'user' ? 'Your cocktail is under moderator review.' : 'Cocktail successfully created.',
+      {
+        description: `${dayjs(new Date()).format('dddd, MMMM DD, YYYY [at] hh:mm A')}`,
+        className: 'border',
+      }
+    );
   };
 
   const handleOpenChange = (open: boolean) => {

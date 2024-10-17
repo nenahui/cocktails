@@ -1,4 +1,4 @@
-import { createCocktail, fetchCocktails, fetchMyCocktails } from '@/features/cocktails/cocktailsThunks';
+import { createCocktail, deleteCocktail, fetchCocktails, fetchMyCocktails } from '@/features/cocktails/cocktailsThunks';
 import type { Cocktail } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -8,6 +8,7 @@ interface CocktailsState {
   myCocktailsFetching: boolean;
   cocktailsFetching: boolean;
   cocktailsCreating: boolean;
+  cocktailsDeleting: string | null;
 }
 
 const initialState: CocktailsState = {
@@ -16,19 +17,13 @@ const initialState: CocktailsState = {
   myCocktailsFetching: false,
   cocktailsFetching: false,
   cocktailsCreating: false,
+  cocktailsDeleting: null,
 };
 
 export const cocktailsSlice = createSlice({
   name: 'cocktails',
   initialState,
-  reducers: {
-    addCocktail: (state, { payload: cocktail }: { payload: Cocktail }) => {
-      state.cocktails.push(cocktail);
-    },
-    addMyCocktail: (state, { payload: cocktail }: { payload: Cocktail }) => {
-      state.myCocktails.push(cocktail);
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCocktails.pending, (state) => {
@@ -64,6 +59,17 @@ export const cocktailsSlice = createSlice({
       .addCase(fetchMyCocktails.rejected, (state) => {
         state.myCocktailsFetching = false;
       });
+
+    builder
+      .addCase(deleteCocktail.pending, (state, { meta }) => {
+        state.cocktailsDeleting = meta.arg;
+      })
+      .addCase(deleteCocktail.fulfilled, (state) => {
+        state.cocktailsDeleting = null;
+      })
+      .addCase(deleteCocktail.rejected, (state) => {
+        state.cocktailsDeleting = null;
+      });
   },
   selectors: {
     selectCocktails: (state) => state.cocktails,
@@ -71,6 +77,7 @@ export const cocktailsSlice = createSlice({
     selectCocktailsCreating: (state) => state.cocktailsCreating,
     selectMyCocktails: (state) => state.myCocktails,
     selectMyCocktailsFetching: (state) => state.myCocktailsFetching,
+    selectCocktailsDeleting: (state) => state.cocktailsDeleting,
   },
 });
 
@@ -80,6 +87,5 @@ export const {
   selectCocktailsCreating,
   selectMyCocktailsFetching,
   selectMyCocktails,
+  selectCocktailsDeleting,
 } = cocktailsSlice.selectors;
-
-export const { addCocktail, addMyCocktail } = cocktailsSlice.actions;

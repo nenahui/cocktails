@@ -9,7 +9,7 @@ export interface Grade {
 }
 
 export interface Cocktail {
-  _id: number;
+  _id: string;
   user: string;
   name: string;
   image: string;

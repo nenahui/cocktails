@@ -2,8 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -15,6 +18,7 @@ import { randomUUID } from 'crypto';
 import type { Model } from 'mongoose';
 import { diskStorage } from 'multer';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { Cocktail, type CocktailDocument } from '../schemas/cocktail.schema';
 import type { UserDocument } from '../schemas/user.schema';
@@ -32,13 +36,19 @@ export class CocktailsController {
   @Get()
   @UseGuards(OptionalAuthGuard)
   async getAll(@Req() req: Request) {
-    const user = req.user as UserDocument;
+    const user = req.user as UserDocument | undefined;
 
-    if (user?.role === 'admin') {
+    if (user && user.role === 'admin') {
       return this.cocktailsModel.find();
     }
 
     return this.cocktailsModel.find({ isPublished: true });
+  }
+
+  @Get('/user/:userId')
+  @UseGuards(TokenAuthGuard)
+  async getUserCocktails(@Param('userId') userId: string) {
+    return this.cocktailsModel.find({ user: userId });
   }
 
   @Post()
@@ -89,15 +99,23 @@ export class CocktailsController {
 
     const user = req.user as UserDocument;
 
-    const cocktail = new this.cocktailsModel({
+    const cocktail = await new this.cocktailsModel({
       user: user._id,
       name,
       image: `cocktails/${file.filename}`,
       recipe,
       ingredients,
       grades,
-    });
+    }).populate('user');
 
     return await cocktail.save();
+  }
+
+  @Delete(':id')
+  @UseGuards(TokenAuthGuard, RolesGuard)
+  async deleteCocktail(@Param('id') id: string) {
+    await this.cocktailsModel.findByIdAndDelete(id);
+
+    return;
   }
 }

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Req,
@@ -54,10 +55,14 @@ export class UsersController {
     return req.user;
   }
 
+  @Delete('logout')
   @UseGuards(TokenAuthGuard)
-  @Get('secret')
-  async secret(@Req() req: Request) {
+  async logout(@Req() req: Request) {
     const user = req.user as UserDocument;
-    return { message: 'This is a secret message', email: user.email };
+    user.generateToken();
+
+    await user.save();
+
+    return;
   }
 }
