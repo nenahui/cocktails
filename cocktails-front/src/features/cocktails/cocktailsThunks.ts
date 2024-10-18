@@ -17,6 +17,12 @@ export const fetchMyCocktails = createAsyncThunk<Cocktail[], string>(
   }
 );
 
+export const fetchCocktail = createAsyncThunk<Cocktail, string>('cocktails/fetchCocktail', async (id: string) => {
+  const { data: cocktail } = await axiosApi.get<Cocktail>(`/cocktails/${id}`);
+
+  return cocktail;
+});
+
 export const createCocktail = createAsyncThunk<Cocktail, CocktailMutation>(
   'cocktails/createCocktail',
   async (cocktailMutation) => {
@@ -26,7 +32,7 @@ export const createCocktail = createAsyncThunk<Cocktail, CocktailMutation>(
       if (key === 'ingredients') {
         (value as Ingredient[]).forEach((ingredient, index) => {
           formData.append(`ingredients[${index}][name]`, ingredient.name);
-          formData.append(`ingredients[${index}][amount]`, ingredient.quantity);
+          formData.append(`ingredients[${index}][quantity]`, ingredient.quantity);
         });
       } else if (key === 'image' && value instanceof File) {
         formData.append(key, value);

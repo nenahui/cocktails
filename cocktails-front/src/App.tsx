@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/protectedRoute/protectedRoute';
 import { Toaster } from '@/components/ui/sonner';
 import { Cocktails } from '@/features/cocktails/cocktails';
 import { MyCocktails } from '@/features/cocktails/myCocktails';
+import { OneCocktail } from '@/features/cocktails/oneCocktail';
 import { Login } from '@/features/users/login';
 import { Register } from '@/features/users/register';
 import { selectUser } from '@/features/users/usersSlice';
@@ -26,6 +27,7 @@ export const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route path={'/cocktails/:id'} element={<OneCocktail />} />
         <Route path={'/login'} element={<Login />} />
         <Route path={'/register'} element={<Register />} />
         <Route

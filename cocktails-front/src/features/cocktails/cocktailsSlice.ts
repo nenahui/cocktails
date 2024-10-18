@@ -1,6 +1,7 @@
 import {
   createCocktail,
   deleteCocktail,
+  fetchCocktail,
   fetchCocktails,
   fetchMyCocktails,
   publishCocktail,
@@ -11,21 +12,25 @@ import { createSlice } from '@reduxjs/toolkit';
 interface CocktailsState {
   cocktails: Cocktail[];
   myCocktails: Cocktail[];
+  cocktail: Cocktail | null;
   myCocktailsFetching: boolean;
   cocktailsFetching: boolean;
   cocktailsCreating: boolean;
   cocktailsDeleting: string | null;
   cocktailsPublishing: string | null;
+  oneCocktailFetching: boolean;
 }
 
 const initialState: CocktailsState = {
   cocktails: [],
   myCocktails: [],
+  cocktail: null,
   myCocktailsFetching: false,
   cocktailsFetching: false,
   cocktailsCreating: false,
   cocktailsDeleting: null,
   cocktailsPublishing: null,
+  oneCocktailFetching: false,
 };
 
 export const cocktailsSlice = createSlice({
@@ -89,6 +94,18 @@ export const cocktailsSlice = createSlice({
       .addCase(publishCocktail.rejected, (state) => {
         state.cocktailsPublishing = null;
       });
+
+    builder
+      .addCase(fetchCocktail.pending, (state) => {
+        state.oneCocktailFetching = true;
+      })
+      .addCase(fetchCocktail.fulfilled, (state, { payload: cocktail }) => {
+        state.cocktail = cocktail;
+        state.oneCocktailFetching = false;
+      })
+      .addCase(fetchCocktail.rejected, (state) => {
+        state.oneCocktailFetching = false;
+      });
   },
   selectors: {
     selectCocktails: (state) => state.cocktails,
@@ -98,6 +115,8 @@ export const cocktailsSlice = createSlice({
     selectMyCocktailsFetching: (state) => state.myCocktailsFetching,
     selectCocktailsDeleting: (state) => state.cocktailsDeleting,
     selectCocktailsPublishing: (state) => state.cocktailsPublishing,
+    selectCocktail: (state) => state.cocktail,
+    selectOneCocktail: (state) => state.oneCocktailFetching,
   },
 });
 
@@ -109,4 +128,6 @@ export const {
   selectMyCocktails,
   selectCocktailsDeleting,
   selectCocktailsPublishing,
+  selectCocktail,
+  selectOneCocktail,
 } = cocktailsSlice.selectors;

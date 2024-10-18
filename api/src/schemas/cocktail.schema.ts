@@ -25,7 +25,16 @@ export class Cocktail {
   @Prop({ required: true })
   ingredients: Ingredient[];
 
-  @Prop()
+  @Prop([
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
+      grade: { type: Number, required: true, min: 1, max: 5 },
+    },
+  ])
   grades: Grade[];
 }
 

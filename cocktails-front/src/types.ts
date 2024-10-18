@@ -14,6 +14,7 @@ export interface Cocktail {
   name: string;
   image: string;
   recipe: string;
+  ingredients: Ingredient[];
   isPublished: boolean;
   grades: Grade[];
 }

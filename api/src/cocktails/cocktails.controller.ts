@@ -47,6 +47,12 @@ export class CocktailsController {
     return this.cocktailsModel.find({ user: userId });
   }
 
+  @Get(':id')
+  @UseGuards(OptionalAuthGuard)
+  async getCocktail(@Param('id') id: string) {
+    return this.cocktailsModel.findById(id);
+  }
+
   @Post()
   @UseGuards(TokenAuthGuard)
   @UseInterceptors(UploadInterceptor('./public/cocktails', 'image'))

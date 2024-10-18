@@ -17,7 +17,7 @@ import { CheckBadgeIcon, ClockIcon, TrashIcon, XMarkIcon } from '@heroicons/reac
 import { PopoverClose } from '@radix-ui/react-popover';
 import dayjs from 'dayjs';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -62,45 +62,54 @@ export const CocktailsCard: React.FC<Props> = ({ cocktail }) => {
 
   return (
     <Card className={'shadow-none border-0 h-full w-full p-4 rounded-2xl relative'}>
-      <div
-        className={`${cocktailsDeleting === cocktail._id && 'opacity-10'} ${cocktailsPublishing === cocktail._id && 'opacity-10'}`}
-      >
-        <div className={'bg-muted rounded-2xl'}>
-          <img
-            src={`${API_URL}/${cocktail.image}`}
-            alt={`${cocktail.name} image`}
-            className={'rounded-2xl w-full aspect-square object-cover mb-3'}
-          />
-        </div>
+      <Link to={`/cocktails/${cocktail._id}`}>
+        <div
+          className={`${cocktailsDeleting === cocktail._id && 'opacity-10'} ${cocktailsPublishing === cocktail._id && 'opacity-10'}`}
+        >
+          <div className={'bg-muted rounded-2xl'}>
+            <img
+              src={`${API_URL}/${cocktail.image}`}
+              alt={`${cocktail.name} image`}
+              className={'rounded-2xl w-full aspect-square object-cover mb-3'}
+            />
+          </div>
 
-        {user?.role === 'admin' && !cocktail.isPublished ? (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                size={'icon'}
-                className={'bg-muted hover:bg-gray-200 border shadow-none absolute top-2 left-2 rounded-xl'}
-              >
-                <ClockIcon className={'text-black'} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className={'max-w-max space-x-1 p-2'}>
-              <small className={'block text-center mb-1'}>Do you want to publish?</small>
-              <div className={'flex gap-1'}>
-                <PopoverClose asChild>
-                  <Button size={'sm'} variant={'outline'}>
-                    Cancel
-                    <XMarkIcon />
-                  </Button>
-                </PopoverClose>
-                <PopoverClose asChild>
-                  <Button onClick={handlePublish} size={'sm'}>
-                    Publish <CheckBadgeIcon />
-                  </Button>
-                </PopoverClose>
-              </div>
-            </PopoverContent>
-          </Popover>
-        ) : (
+          <div>
+            <CardTitle className={'font-medium'}>{cocktail.name}</CardTitle>
+            <CardDescription className={'line-clamp-2'}>{cocktail.recipe}</CardDescription>
+          </div>
+        </div>
+      </Link>
+
+      {user?.role === 'admin' && !cocktail.isPublished ? (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              size={'icon'}
+              className={'bg-muted hover:bg-gray-200 border shadow-none absolute top-2 left-2 rounded-xl'}
+            >
+              <ClockIcon className={'text-black'} />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className={'max-w-max space-x-1 p-2'}>
+            <small className={'block text-center mb-1'}>Do you want to publish?</small>
+            <div className={'flex gap-1'}>
+              <PopoverClose asChild>
+                <Button size={'sm'} variant={'outline'}>
+                  Cancel
+                  <XMarkIcon />
+                </Button>
+              </PopoverClose>
+              <PopoverClose asChild>
+                <Button onClick={handlePublish} size={'sm'}>
+                  Publish <CheckBadgeIcon />
+                </Button>
+              </PopoverClose>
+            </div>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        !cocktail.isPublished && (
           <TooltipProvider>
             <Tooltip delayDuration={1}>
               <TooltipTrigger asChild>
@@ -116,39 +125,34 @@ export const CocktailsCard: React.FC<Props> = ({ cocktail }) => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )}
+        )
+      )}
 
-        {user && user.role === 'admin' && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button size={'icon'} className={`absolute top-2 left-12 ${cocktail.isPublished && 'left-2'} rounded-xl`}>
-                <TrashIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className={'max-w-max space-x-1 p-2'}>
-              <small className={'block text-center mb-1'}>Do you really want to delete?</small>
-              <div className={'flex gap-1'}>
-                <PopoverClose asChild>
-                  <Button size={'sm'} variant={'outline'}>
-                    Cancel
-                    <XMarkIcon />
-                  </Button>
-                </PopoverClose>
-                <PopoverClose asChild>
-                  <Button onClick={handleDelete} size={'sm'}>
-                    Delete <TrashIcon />
-                  </Button>
-                </PopoverClose>
-              </div>
-            </PopoverContent>
-          </Popover>
-        )}
-
-        <div>
-          <CardTitle className={'font-medium'}>{cocktail.name}</CardTitle>
-          <CardDescription className={'line-clamp-2'}>{cocktail.recipe}</CardDescription>
-        </div>
-      </div>
+      {user && user.role === 'admin' && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button size={'icon'} className={`absolute top-2 left-12 ${cocktail.isPublished && 'left-2'} rounded-xl`}>
+              <TrashIcon />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className={'max-w-max space-x-1 p-2'}>
+            <small className={'block text-center mb-1'}>Do you really want to delete?</small>
+            <div className={'flex gap-1'}>
+              <PopoverClose asChild>
+                <Button size={'sm'} variant={'outline'}>
+                  Cancel
+                  <XMarkIcon />
+                </Button>
+              </PopoverClose>
+              <PopoverClose asChild>
+                <Button onClick={handleDelete} size={'sm'}>
+                  Delete <TrashIcon />
+                </Button>
+              </PopoverClose>
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
 
       {cocktailsDeleting === cocktail._id && <Loader absolute />}
       {cocktailsPublishing === cocktail._id && <Loader absolute />}
