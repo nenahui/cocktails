@@ -44,3 +44,7 @@ export const createCocktail = createAsyncThunk<Cocktail, CocktailMutation>(
 export const deleteCocktail = createAsyncThunk<void, string>('cocktails/deleteCocktail', async (id: string) => {
   await axiosApi.delete(`/cocktails/${id}`);
 });
+
+export const publishCocktail = createAsyncThunk<void, string>('cocktails/publishCocktail', async (id: string) => {
+  await axiosApi.patch<Cocktail>(`/cocktails/${id}/publish`);
+});

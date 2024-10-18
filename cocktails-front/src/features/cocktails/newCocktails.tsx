@@ -1,4 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { Loader } from '@/components/loader/loader';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { selectCocktailsCreating } from '@/features/cocktails/cocktailsSlice';
 import { createCocktail, fetchCocktails, fetchMyCocktails } from '@/features/cocktails/cocktailsThunks';
 import { selectUser } from '@/features/users/usersSlice';
 import type { CocktailMutation } from '@/types';
@@ -33,6 +35,7 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(false);
   const [cocktailMutation, setCocktailMutation] = React.useState<CocktailMutation>(initialState);
+  const cocktailsCreating = useAppSelector(selectCocktailsCreating);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -179,8 +182,8 @@ export const NewCocktails: React.FC<PropsWithChildren> = ({ children }) => {
               <Input onChange={handleInputImageChange} required id={'image'} type={'file'} />
             </div>
 
-            <Button type={'submit'} size={'sm'} className={'w-full'}>
-              Add new cocktail
+            <Button disabled={cocktailsCreating} type={'submit'} size={'sm'} className={'w-full'}>
+              Add new cocktail {cocktailsCreating && <Loader />}
             </Button>
           </div>
         </form>

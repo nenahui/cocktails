@@ -1,4 +1,10 @@
-import { createCocktail, deleteCocktail, fetchCocktails, fetchMyCocktails } from '@/features/cocktails/cocktailsThunks';
+import {
+  createCocktail,
+  deleteCocktail,
+  fetchCocktails,
+  fetchMyCocktails,
+  publishCocktail,
+} from '@/features/cocktails/cocktailsThunks';
 import type { Cocktail } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -9,6 +15,7 @@ interface CocktailsState {
   cocktailsFetching: boolean;
   cocktailsCreating: boolean;
   cocktailsDeleting: string | null;
+  cocktailsPublishing: string | null;
 }
 
 const initialState: CocktailsState = {
@@ -18,6 +25,7 @@ const initialState: CocktailsState = {
   cocktailsFetching: false,
   cocktailsCreating: false,
   cocktailsDeleting: null,
+  cocktailsPublishing: null,
 };
 
 export const cocktailsSlice = createSlice({
@@ -70,6 +78,17 @@ export const cocktailsSlice = createSlice({
       .addCase(deleteCocktail.rejected, (state) => {
         state.cocktailsDeleting = null;
       });
+
+    builder
+      .addCase(publishCocktail.pending, (state, { meta }) => {
+        state.cocktailsPublishing = meta.arg;
+      })
+      .addCase(publishCocktail.fulfilled, (state) => {
+        state.cocktailsPublishing = null;
+      })
+      .addCase(publishCocktail.rejected, (state) => {
+        state.cocktailsPublishing = null;
+      });
   },
   selectors: {
     selectCocktails: (state) => state.cocktails,
@@ -78,6 +97,7 @@ export const cocktailsSlice = createSlice({
     selectMyCocktails: (state) => state.myCocktails,
     selectMyCocktailsFetching: (state) => state.myCocktailsFetching,
     selectCocktailsDeleting: (state) => state.cocktailsDeleting,
+    selectCocktailsPublishing: (state) => state.cocktailsPublishing,
   },
 });
 
@@ -88,4 +108,5 @@ export const {
   selectMyCocktailsFetching,
   selectMyCocktails,
   selectCocktailsDeleting,
+  selectCocktailsPublishing,
 } = cocktailsSlice.selectors;
