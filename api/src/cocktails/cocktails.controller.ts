@@ -6,26 +6,21 @@ import {
   Get,
   Param,
   Post,
-  Query,
   Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { randomUUID } from 'crypto';
+import { Request } from 'express';
 import type { Model } from 'mongoose';
-import { diskStorage } from 'multer';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
+import { UploadInterceptor } from '../interceptors/upload.interceptor';
 import { Cocktail, type CocktailDocument } from '../schemas/cocktail.schema';
 import type { UserDocument } from '../schemas/user.schema';
 import { CreateCocktailDto } from './dto/create-cocktail.dto';
-import { Request } from 'express';
-import { extname } from 'path';
-import { existsSync, mkdirSync } from 'fs';
 
 @Controller('cocktails')
 export class CocktailsController {
@@ -53,39 +48,7 @@ export class CocktailsController {
 
   @Post()
   @UseGuards(TokenAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: (_req, _file, callback) => {
-          const uploadPath = './public/cocktails';
-
-          if (!existsSync(uploadPath)) {
-            mkdirSync(uploadPath, { recursive: true });
-          }
-
-          callback(null, uploadPath);
-        },
-        filename: (_req, file, callback) => {
-          const uniqueName = randomUUID();
-          const ext = extname(file.originalname);
-          callback(null, uniqueName + ext);
-        },
-      }),
-      fileFilter: (_req, file, callback) => {
-        if (file.mimetype.match(/\/(jpg|webp|jpeg|png)$/)) {
-          callback(null, true);
-        } else {
-          callback(
-            new BadRequestException(
-              'Only JPG, JPEG, and PNG files are allowed',
-            ),
-            false,
-          );
-        }
-      },
-      limits: { fileSize: 1024 * 1024 * 5 },
-    }),
-  )
+  @UseInterceptors(UploadInterceptor('./public/cocktails', 'image'))
   async createCocktail(
     @Req() req: Request,
     @Body() createCocktailDto: CreateCocktailDto,

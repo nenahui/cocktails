@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Post,
   Req,
   UploadedFile,
@@ -12,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AuthGuard } from '@nestjs/passport';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import type { Model } from 'mongoose';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
+import { UploadInterceptor } from '../interceptors/upload.interceptor';
 import { User, type UserDocument } from '../schemas/user.schema';
 import { RegisterUserDto } from './dto/register-user.dto';
 
@@ -24,7 +23,7 @@ export class UsersController {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('avatar', { dest: './public/images' }))
+  @UseInterceptors(UploadInterceptor('./public/avatars', 'avatar'))
   async registerUser(
     @Body() registerUserDto: RegisterUserDto,
     @UploadedFile() file: Express.Multer.File,
@@ -38,7 +37,7 @@ export class UsersController {
     const user = new this.userModel({
       email,
       displayName,
-      avatar: `images/${file.filename}`,
+      avatar: `avatars/${file.filename}`,
       password,
       googleId,
       role: 'user',

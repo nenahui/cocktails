@@ -1,3 +1,4 @@
 .DS_Store
 .idea
-./api/public/*
+api/public/*
+api/public/cocktails/*

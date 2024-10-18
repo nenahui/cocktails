@@ -3,7 +3,8 @@
 /node_modules
 /build
 
-./public/*
+/api/public/*
+/api/public/cocktails/*
 
 # Logs
 logs
