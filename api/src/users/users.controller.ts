@@ -48,8 +48,8 @@ export class UsersController {
     return await user.save();
   }
 
-  @Post('sessions')
   @UseGuards(AuthGuard('local'))
+  @Post('sessions')
   async login(@Req() req: Request) {
     return req.user;
   }

@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UploadedFile,
@@ -72,6 +73,21 @@ export class CocktailsController {
     }).populate('user');
 
     return await cocktail.save();
+  }
+
+  @Patch(':id/publish')
+  @UseGuards(TokenAuthGuard, RolesGuard)
+  async publishCocktail(@Param('id') id: string) {
+    const cocktail = await this.cocktailsModel.findById(id);
+
+    if (!cocktail) {
+      throw new BadRequestException('Cocktail not found');
+    }
+
+    cocktail.isPublished = true;
+    await cocktail.save();
+
+    return { message: 'Cocktail published successfully', cocktail };
   }
 
   @Delete(':id')

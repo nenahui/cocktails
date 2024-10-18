@@ -51,7 +51,7 @@ UserSchema.methods.checkPassword = function (password: string) {
   return compare(password, this.password);
 };
 
-UserSchema.pre('save', async function () {
+UserSchema.pre<UserDocument>('save', async function () {
   if (!this.isModified('password')) {
     return;
   }
