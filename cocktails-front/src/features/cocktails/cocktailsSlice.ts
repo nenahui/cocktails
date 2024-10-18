@@ -6,13 +6,13 @@ import {
   fetchMyCocktails,
   publishCocktail,
 } from '@/features/cocktails/cocktailsThunks';
-import type { Cocktail } from '@/types';
+import type { Cocktail, OneCocktail } from '@/types';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface CocktailsState {
   cocktails: Cocktail[];
   myCocktails: Cocktail[];
-  cocktail: Cocktail | null;
+  cocktail: OneCocktail | null;
   myCocktailsFetching: boolean;
   cocktailsFetching: boolean;
   cocktailsCreating: boolean;

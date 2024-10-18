@@ -1,5 +1,5 @@
 import { axiosApi } from '@/axiosApi';
-import type { Cocktail, CocktailMutation, Ingredient } from '@/types';
+import type { Cocktail, CocktailMutation, Ingredient, OneCocktail } from '@/types';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const fetchCocktails = createAsyncThunk<Cocktail[]>('cocktails/fetchCocktails', async () => {
@@ -17,8 +17,8 @@ export const fetchMyCocktails = createAsyncThunk<Cocktail[], string>(
   }
 );
 
-export const fetchCocktail = createAsyncThunk<Cocktail, string>('cocktails/fetchCocktail', async (id: string) => {
-  const { data: cocktail } = await axiosApi.get<Cocktail>(`/cocktails/${id}`);
+export const fetchCocktail = createAsyncThunk<OneCocktail, string>('cocktails/fetchCocktail', async (id: string) => {
+  const { data: cocktail } = await axiosApi.get<OneCocktail>(`/cocktails/${id}`);
 
   return cocktail;
 });
@@ -54,3 +54,10 @@ export const deleteCocktail = createAsyncThunk<void, string>('cocktails/deleteCo
 export const publishCocktail = createAsyncThunk<void, string>('cocktails/publishCocktail', async (id: string) => {
   await axiosApi.patch<Cocktail>(`/cocktails/${id}/publish`);
 });
+
+export const rateCocktail = createAsyncThunk<void, { cocktailId: string; grade: number | null }>(
+  'cocktails/rateCocktail',
+  async ({ cocktailId, grade }) => {
+    await axiosApi.patch(`/cocktails/${cocktailId}/rate`, { grade });
+  }
+);

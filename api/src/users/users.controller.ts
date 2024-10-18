@@ -32,15 +32,13 @@ export class UsersController {
       throw new BadRequestException('Please provide a valid avatar file');
     }
 
-    const { email, displayName, password, googleId } = registerUserDto;
+    const { email, displayName, password } = registerUserDto;
 
     const user = new this.userModel({
       email,
       displayName,
       avatar: `avatars/${file.filename}`,
       password,
-      googleId,
-      role: 'user',
     });
 
     user.generateToken();

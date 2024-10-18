@@ -36,9 +36,6 @@ export class User {
 
   @Prop({ required: true, enum: UserRoles, default: UserRoles.user })
   role: UserRoles;
-
-  @Prop()
-  googleId: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

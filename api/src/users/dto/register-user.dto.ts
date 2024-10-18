@@ -16,6 +16,4 @@ export class RegisterUserDto {
   password: string;
 
   token: string;
-
-  googleId: string;
 }

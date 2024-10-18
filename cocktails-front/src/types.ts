@@ -19,6 +19,12 @@ export interface Cocktail {
   grades: Grade[];
 }
 
+export interface OneCocktail {
+  cocktail: Cocktail;
+  averageGrade: number;
+  totalGrades: number;
+}
+
 export interface CocktailMutation {
   name: string;
   image: File | null;

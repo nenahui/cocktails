@@ -22,6 +22,7 @@ import { UploadInterceptor } from '../interceptors/upload.interceptor';
 import { Cocktail, type CocktailDocument } from '../schemas/cocktail.schema';
 import type { UserDocument } from '../schemas/user.schema';
 import { CreateCocktailDto } from './dto/create-cocktail.dto';
+import type { RateCocktailDto } from './dto/rate-cocktails.dto';
 
 @Controller('cocktails')
 export class CocktailsController {
@@ -49,8 +50,26 @@ export class CocktailsController {
 
   @Get(':id')
   @UseGuards(OptionalAuthGuard)
-  async getCocktail(@Param('id') id: string) {
-    return this.cocktailsModel.findById(id);
+  async getCocktail(@Param('id') id: string, @Req() req: Request) {
+    const cocktail = await this.cocktailsModel.findById(id);
+    if (!cocktail) {
+      throw new BadRequestException('Cocktail not found');
+    }
+
+    const averageGrade = this.calculateAverageGrade(cocktail);
+    const totalGrades = cocktail.grades.length;
+
+    const user = req.user as UserDocument;
+    const userGrade = user
+      ? cocktail.grades.find((g) => g.user === user._id.toString())?.grade
+      : null;
+
+    return {
+      cocktail,
+      averageGrade,
+      totalGrades,
+      userGrade,
+    };
   }
 
   @Post()
@@ -81,6 +100,46 @@ export class CocktailsController {
     return await cocktail.save();
   }
 
+  @Patch(':id/rate')
+  @UseGuards(TokenAuthGuard)
+  async rateCocktail(
+    @Param('id') id: string,
+    @Body() rateCocktailDto: RateCocktailDto,
+    @Req() req: Request,
+  ) {
+    const cocktail = await this.cocktailsModel.findById(id);
+    if (!cocktail) {
+      throw new BadRequestException('Cocktail not found');
+    }
+
+    const { grade } = rateCocktailDto;
+    const user = req.user as UserDocument;
+
+    const existingGradeIndex = cocktail.grades.findIndex(
+      (g) => g.user.toString() === user._id.toString(),
+    );
+
+    if (existingGradeIndex !== -1) {
+      cocktail.grades[existingGradeIndex].grade = grade;
+    } else {
+      cocktail.grades.push({
+        user: user._id.toString(),
+        grade,
+      });
+    }
+
+    await cocktail.save();
+
+    const averageGrade = this.calculateAverageGrade(cocktail);
+    const totalGrades = cocktail.grades.length;
+
+    return {
+      message: 'Rating submitted successfully',
+      averageGrade,
+      totalGrades,
+    };
+  }
+
   @Patch(':id/publish')
   @UseGuards(TokenAuthGuard, RolesGuard)
   async publishCocktail(@Param('id') id: string) {
@@ -102,5 +161,12 @@ export class CocktailsController {
     await this.cocktailsModel.findByIdAndDelete(id);
 
     return;
+  }
+
+  private calculateAverageGrade(cocktail: CocktailDocument) {
+    if (cocktail.grades.length === 0) return 0;
+
+    const total = cocktail.grades.reduce((sum, { grade }) => sum + grade, 0);
+    return total / cocktail.grades.length;
   }
 }
